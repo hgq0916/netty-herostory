@@ -24,7 +24,7 @@ public class GameMsgHandler extends SimpleChannelInboundHandler<Object> {
 
         System.out.println("收到的字节:");
         for(byte b: bytes){
-            System.out.println(b);
+            System.out.print(b);
             System.out.print(",");
         }
         System.out.println();
