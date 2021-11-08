@@ -36,6 +36,7 @@ public class ServerMain {
                 sc.pipeline().addLast(new HttpServerCodec(),
                         new HttpObjectAggregator(65535),
                         new WebSocketServerProtocolHandler("/websocket"),
+                        new GameMsgEncoder(),
                         new GameMsgDecoder(),
                         new GameMsgHandler()
                 );

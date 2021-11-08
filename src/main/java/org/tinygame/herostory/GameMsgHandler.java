@@ -9,8 +9,13 @@ import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tinygame.herostory.msg.GameMsgProtocol.UserEntryCmd;
-import org.tinygame.herostory.msg.GameMsgProtocol.UserEntryResult;
+import org.tinygame.herostory.model.User;
+import org.tinygame.herostory.msg.GameMsgProtocol;
+import org.tinygame.herostory.msg.GameMsgProtocol.*;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -24,9 +29,12 @@ public class GameMsgHandler extends SimpleChannelInboundHandler<Object> {
 
     private static final ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
+    private static final Map<Integer, User> userMap = new ConcurrentHashMap<Integer, User>();
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         //将新的客户端加入通道组
+        super.channelActive(ctx);
         channelGroup.add(ctx.channel());
     }
 
@@ -49,7 +57,30 @@ public class GameMsgHandler extends SimpleChannelInboundHandler<Object> {
             builder.setHeroAvatar(heroAvatar);
             UserEntryResult userEntryResult = builder.build();
 
+            //将用户加入群组
+            User user = User.builder().id(userId).heroAvatar(heroAvatar).build();
+            userMap.put(userId,user);
+
             channelGroup.writeAndFlush(userEntryResult);
+        }else  if(msg instanceof WhoElseIsHereCmd){
+            //都有哪些用户在场
+            WhoElseIsHereResult.Builder builder = WhoElseIsHereResult.newBuilder();
+
+            for(Map.Entry<Integer,User> userEntry: userMap.entrySet()){
+                if(userEntry.getKey() == null || userEntry.getValue() == null){
+                    continue;
+                }
+                Integer userId = userEntry.getKey();
+                User user = userEntry.getValue();
+                WhoElseIsHereResult.UserInfo.Builder userBuilder =WhoElseIsHereResult.UserInfo.newBuilder();
+                userBuilder.setUserId(userId);
+                userBuilder.setHeroAvatar(user.getHeroAvatar());
+                WhoElseIsHereResult.UserInfo userInfo = userBuilder.build();
+                builder.addUserInfo(userInfo);
+            }
+            WhoElseIsHereResult whoElseIsHereResult = builder.build();
+
+            ctx.writeAndFlush(whoElseIsHereResult);
         }else {
             log.error("不支持的消息类型，clazz:"+msg.getClass().getName());
             return;

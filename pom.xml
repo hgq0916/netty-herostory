@@ -24,6 +24,13 @@
             <artifactId>protobuf-java-util</artifactId>
             <version>3.19.0</version>
         </dependency>
+        <!-- 省略get/set等方法 -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.18</version>
+            <optional>true</optional>
+        </dependency>
         <!--日志 start-->
         <dependency>
             <groupId>log4j</groupId>
