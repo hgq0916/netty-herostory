@@ -19,6 +19,9 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 public class ServerMain {
 
     public static void main(String[] args) {
+
+        //初始化工厂
+        CmdHandlerFactory.init();
         //两个线程池
         //负责处理客户端连接,获取连接后把连接交给worker线程池处理
         EventLoopGroup bossGroup = new NioEventLoopGroup();
