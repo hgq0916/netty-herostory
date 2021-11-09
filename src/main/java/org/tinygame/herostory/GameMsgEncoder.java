@@ -36,6 +36,10 @@ public class GameMsgEncoder extends ChannelOutboundHandlerAdapter {
             msgCode = MsgCode.USER_ENTRY_RESULT_VALUE;
         }else if(msg instanceof WhoElseIsHereResult){
             msgCode = MsgCode.WHO_ELSE_IS_HERE_RESULT_VALUE;
+        }else if(msg instanceof UserMoveToResult){
+            msgCode = MsgCode.USER_MOVE_TO_RESULT_VALUE;
+        }else if(msg instanceof UserQuitResult){
+            msgCode = MsgCode.USER_QUIT_RESULT_VALUE;
         }else {
             logger.error("不支持编码的消息类型:clazz="+msg.getClass().getName());
             return;
