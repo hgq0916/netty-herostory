@@ -1,5 +1,6 @@
 package org.tinygame.herostory;
 
+import com.google.protobuf.GeneratedMessageV3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tinygame.herostory.cmdHandler.ICmdHandler;
@@ -30,7 +31,7 @@ public final class CmdHandlerFactory {
     private CmdHandlerFactory(){}
 
 
-    public static ICmdHandler create(Class<?> clazz){
+    public static ICmdHandler<? extends GeneratedMessageV3> create(Class<?> clazz){
        if(clazz == null){
            return null;
        }

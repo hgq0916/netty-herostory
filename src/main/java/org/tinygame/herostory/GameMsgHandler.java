@@ -66,8 +66,8 @@ public class GameMsgHandler extends SimpleChannelInboundHandler<Object> {
 
         ICmdHandler<? extends GeneratedMessageV3> handler = CmdHandlerFactory.create(msg.getClass());
         if(handler != null){
-            //todo 泛型处理
-            //handler.handle(ctx,cast(msg));
+            //泛型处理
+            handler.handle(ctx,cast(msg));
         }
 
     }
