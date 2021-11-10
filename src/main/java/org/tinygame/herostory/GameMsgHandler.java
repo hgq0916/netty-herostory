@@ -47,6 +47,11 @@ public class GameMsgHandler extends SimpleChannelInboundHandler<Object> {
         BroadCaster.removeChannel(ctx.channel());
         //从用户组中移除
         Integer userId = (Integer) ctx.channel().attr(AttributeKey.valueOf("userId")).get();
+
+        if(null == userId){
+            return;
+        }
+
         UserManager.removeUser(userId);
 
         //通知其他用户该用户离场

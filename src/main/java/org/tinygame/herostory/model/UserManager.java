@@ -23,6 +23,9 @@ public class UserManager {
     }
 
     public static void removeUser(Integer userId){
+        if(null == null){
+            return;
+        }
         userMap.remove(userId);
     }
 

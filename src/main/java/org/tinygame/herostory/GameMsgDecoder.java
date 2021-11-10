@@ -1,10 +1,13 @@
 package org.tinygame.herostory;
 
 import com.google.protobuf.GeneratedMessageV3;
+import com.google.protobuf.Message;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tinygame.herostory.msg.GameMsgProtocol;
 
 import java.util.Arrays;
@@ -16,6 +19,8 @@ import java.util.Arrays;
  */
 public class GameMsgDecoder extends ChannelInboundHandlerAdapter {
 
+    private static Logger logger = LoggerFactory.getLogger(GameMsgDecoder.class);
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 
@@ -26,39 +31,23 @@ public class GameMsgDecoder extends ChannelInboundHandlerAdapter {
         content.readShort();
 
         //读取消息编号
-        int msgNum = content.readShort();
+        int msgCode = content.readShort();
+
+        Message.Builder builder = GameMsgRecognizer.getGameMsgBuilderByMsgCode(msgCode);
+
+        if(null == builder){
+            logger.error("不支持的消息编码:"+msgCode);
+            return;
+        }
 
         //消息体
         byte[] msgBody = new byte[content.readableBytes()];
         content.readBytes(msgBody);
 
-        GameMsgProtocol.MsgCode msgCode = GameMsgProtocol.MsgCode.forNumber(msgNum);
-
-        GeneratedMessageV3 generatedMessageV3 = null;
-
-        switch (msgCode){
-
-            case USER_ENTRY_CMD:
-                generatedMessageV3 = GameMsgProtocol.UserEntryCmd.parseFrom(msgBody);
-                break;
-            case WHO_ELSE_IS_HERE_CMD:
-                generatedMessageV3 = GameMsgProtocol.WhoElseIsHereCmd.parseFrom(msgBody);
-                break;
-            case USER_MOVE_TO_CMD:
-                generatedMessageV3 = GameMsgProtocol.UserMoveToCmd.parseFrom(msgBody);
-                break;
-            case USER_STOP_CMD:
-                generatedMessageV3 = GameMsgProtocol.UserStopCmd.parseFrom(msgBody);
-                break;
-            case USER_ATTK_CMD:
-                generatedMessageV3 = GameMsgProtocol.UserAttkCmd.parseFrom(msgBody);
-                break;
-            default:
-                throw new RuntimeException("不支持的消息编码:"+msgCode);
-        }
+        builder.clear();
+        Message message = builder.build().getParserForType().parseFrom(msgBody);
 
         //重新将消息放到通道
-        ctx.fireChannelRead(generatedMessageV3);
-
+        ctx.fireChannelRead(message);
     }
 }
