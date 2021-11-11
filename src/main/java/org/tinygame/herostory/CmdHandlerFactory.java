@@ -4,9 +4,6 @@ import com.google.protobuf.GeneratedMessageV3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tinygame.herostory.cmdHandler.ICmdHandler;
-import org.tinygame.herostory.cmdHandler.UserEntryCmdHandler;
-import org.tinygame.herostory.cmdHandler.UserMoveToCmdHandler;
-import org.tinygame.herostory.cmdHandler.WhoElseIsHereCmdHandler;
 import org.tinygame.herostory.msg.GameMsgProtocol;
 
 import java.util.HashMap;
@@ -18,14 +15,49 @@ import java.util.Map;
  */
 public final class CmdHandlerFactory {
 
-    private static Logger log = LoggerFactory.getLogger(CmdHandlerFactory.class);
+    private static Logger logger = LoggerFactory.getLogger(CmdHandlerFactory.class);
 
     private static final Map<Class<?>,ICmdHandler> cmdHandlerMap = new HashMap<Class<?>, ICmdHandler>();
 
     static void init(){
-        cmdHandlerMap.put(GameMsgProtocol.UserEntryCmd.class,new UserEntryCmdHandler());
-        cmdHandlerMap.put(GameMsgProtocol.WhoElseIsHereCmd.class,new WhoElseIsHereCmdHandler());
-        cmdHandlerMap.put(GameMsgProtocol.UserMoveToCmd.class,new UserMoveToCmdHandler());
+
+        String cmdHandlerFullClassName = ICmdHandler.class.getName();
+        String basePackage = cmdHandlerFullClassName.substring(0, cmdHandlerFullClassName.lastIndexOf("."));
+
+        Class<?>[] declaredClasses = GameMsgProtocol.class.getDeclaredClasses();
+
+        for(Class<?> clazz : declaredClasses){
+            //判断GeneratedMessageV3是否是class是的父类
+            if(!GeneratedMessageV3.class.isAssignableFrom(clazz)){
+                continue;
+            }
+            String simpleName = clazz.getSimpleName();
+
+            String handlerClazzName = basePackage +"."+simpleName+"Handler";
+            Class<?> handlerClazz = null;
+            try {
+                handlerClazz = ICmdHandler.class.getClassLoader().loadClass(handlerClazzName);
+            } catch (Exception e) {
+               logger.error("加载该消息对应的处理器失败，clazz:"+clazz.getSimpleName());
+            }
+
+            if(handlerClazz == null){
+                logger.error("加载该消息对应的处理器失败，clazz:"+clazz.getSimpleName());
+                continue;
+            }
+
+            //判断ICmdHandler是否是该类的父类
+            if(!ICmdHandler.class.isAssignableFrom(handlerClazz)){
+                continue;
+            }
+            ICmdHandler handler = null;
+            try {
+                handler = (ICmdHandler) handlerClazz.newInstance();
+            } catch (Exception e) {
+                logger.error("",e);
+            }
+            cmdHandlerMap.put(clazz,handler);
+        }
     }
 
     private CmdHandlerFactory(){}
