@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tinygame.herostory.msg.GameMsgProtocol;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,16 +26,32 @@ public final class GameMsgRecognizer {
     private static final Map<Class<?>,Integer>gameMsgCodeMap = new HashMap<>();
 
     static void init(){
-        messageBuildMap.put(USER_ENTRY_CMD_VALUE,GameMsgProtocol.UserEntryCmd.newBuilder());
-        messageBuildMap.put(WHO_ELSE_IS_HERE_CMD_VALUE,GameMsgProtocol.WhoElseIsHereCmd.newBuilder());
-        messageBuildMap.put(USER_MOVE_TO_CMD_VALUE,GameMsgProtocol.UserMoveToCmd.newBuilder());
-        messageBuildMap.put(USER_STOP_CMD_VALUE,GameMsgProtocol.UserStopCmd.newBuilder());
-        messageBuildMap.put(USER_ATTK_CMD_VALUE,GameMsgProtocol.UserAttkCmd.newBuilder());
+        //获取protocol下定义的所有类
+        Class<?>[] declaredClasses = GameMsgProtocol.class.getDeclaredClasses();
 
-        gameMsgCodeMap.put(GameMsgProtocol.UserEntryResult.class,GameMsgProtocol.MsgCode.USER_ENTRY_RESULT_VALUE);
-        gameMsgCodeMap.put(GameMsgProtocol.WhoElseIsHereResult.class,GameMsgProtocol.MsgCode.WHO_ELSE_IS_HERE_RESULT_VALUE);
-        gameMsgCodeMap.put(GameMsgProtocol.UserMoveToResult.class,GameMsgProtocol.MsgCode.USER_MOVE_TO_RESULT_VALUE);
-        gameMsgCodeMap.put(GameMsgProtocol.UserQuitResult.class,GameMsgProtocol.MsgCode.USER_QUIT_RESULT_VALUE);
+        for(Class<?> clazz : declaredClasses){
+            //获取类名，并转换为小写
+            String simpleName = clazz.getSimpleName();
+            simpleName = simpleName.toLowerCase();
+            for(GameMsgProtocol.MsgCode msgCode: GameMsgProtocol.MsgCode.values()){
+                String msgName = msgCode.name();
+                msgName = msgName.replaceAll("_","").toLowerCase();
+                if(!msgName.startsWith(simpleName)){
+                    continue;
+                }
+
+                try {
+                    Object instance = clazz.getDeclaredMethod("getDefaultInstance").invoke(clazz);
+                    Message.Builder builder = (Message.Builder) clazz.getDeclaredMethod("newBuilderForType").invoke(instance);
+                    messageBuildMap.put(msgCode.getNumber(),builder);
+                    gameMsgCodeMap.put(clazz,msgCode.getNumber());
+                } catch (Exception e) {
+                    logger.error(e.getMessage(),e);
+                }
+
+            }
+        }
+
     }
 
     private GameMsgRecognizer(){}
