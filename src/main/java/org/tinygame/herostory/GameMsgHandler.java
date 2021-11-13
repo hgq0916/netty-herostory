@@ -6,6 +6,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tinygame.herostory.cmdHandler.CmdHandlerFactory;
 import org.tinygame.herostory.cmdHandler.ICmdHandler;
 import org.tinygame.herostory.model.BroadCaster;
 import org.tinygame.herostory.model.UserManager;
