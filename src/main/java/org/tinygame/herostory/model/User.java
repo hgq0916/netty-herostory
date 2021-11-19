@@ -21,4 +21,6 @@ public class User {
     //英雄头像
     private String heroAvatar;
 
+    MoveState moveState;
+
 }
