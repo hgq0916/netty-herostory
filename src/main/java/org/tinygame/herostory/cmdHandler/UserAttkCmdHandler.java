@@ -45,13 +45,35 @@ public class UserAttkCmdHandler implements ICmdHandler<UserAttkCmd> {
             return;
         }
 
+        if(targetUser.getCurrentHp() <=0){
+            return;
+        }
+
         int subtractHp = 10;
         int currentHp = targetUser.getCurrentHp() - subtractHp;
+
+        if(currentHp<=0){
+            //用户死亡，广播用户死亡消息
+            broadCastUserDied(targetUser);
+        }
+
         targetUser.setCurrentHp(currentHp);
 
         //广播用户血量减少消息
         broadCastSubstractHp(targetUser,subtractHp);
 
+    }
+
+    /**
+     * 广播用户死亡消息
+     * @param targetUser
+     */
+    private void broadCastUserDied(User targetUser) {
+        GameMsgProtocol.UserDieResult.Builder builder = GameMsgProtocol.UserDieResult.newBuilder();
+        builder.setTargetUserId(targetUser.getId());
+        GameMsgProtocol.UserDieResult userDieResult = builder.build();
+
+        BroadCaster.broadcast(userDieResult);
     }
 
     /**
