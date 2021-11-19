@@ -4,6 +4,8 @@ import com.google.protobuf.GeneratedMessageV3;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.AttributeKey;
 import org.tinygame.herostory.model.BroadCaster;
+import org.tinygame.herostory.model.User;
+import org.tinygame.herostory.model.UserManager;
 import org.tinygame.herostory.msg.GameMsgProtocol;
 import org.tinygame.herostory.msg.GameMsgProtocol.UserAttkCmd;
 
@@ -35,6 +37,35 @@ public class UserAttkCmdHandler implements ICmdHandler<UserAttkCmd> {
 
         //广播用户攻击消息
         BroadCaster.broadcast(userAttkResult);
+
+        //用户攻击后，目标用户血量减少
+        User targetUser = UserManager.getUserById(targetUserId);
+
+        if(targetUser == null){
+            return;
+        }
+
+        int subtractHp = 10;
+        int currentHp = targetUser.getCurrentHp() - subtractHp;
+        targetUser.setCurrentHp(currentHp);
+
+        //广播用户血量减少消息
+        broadCastSubstractHp(targetUser,subtractHp);
+
+    }
+
+    /**
+     * 广播用户血量减少消息
+     * @param targetUser
+     * @param subtractHp
+     */
+    private void broadCastSubstractHp(User targetUser, int subtractHp) {
+        GameMsgProtocol.UserSubtractHpResult.Builder builder = GameMsgProtocol.UserSubtractHpResult.newBuilder();
+        builder.setTargetUserId(targetUser.getId());
+        builder.setSubtractHp(subtractHp);
+        GameMsgProtocol.UserSubtractHpResult userSubtractHpResult = builder.build();
+
+        BroadCaster.broadcast(userSubtractHpResult);
 
     }
 }
