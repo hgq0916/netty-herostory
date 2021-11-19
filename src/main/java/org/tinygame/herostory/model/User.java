@@ -15,12 +15,19 @@ import lombok.NoArgsConstructor;
 @Builder
 public class User {
 
+    //用户初始血量
+    public static final int INIT_HP = 100;
+
     //用户id
     private Integer id;
 
     //英雄头像
     private String heroAvatar;
 
+    //当前血量
+    private int currentHp;
+
+    //移动状态
     MoveState moveState;
 
 }

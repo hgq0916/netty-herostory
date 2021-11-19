@@ -25,7 +25,11 @@ public class UserEntryCmdHandler implements ICmdHandler<GameMsgProtocol.UserEntr
         GameMsgProtocol.UserEntryResult userEntryResult = builder.build();
 
         //将用户加入群组
-        User user = User.builder().id(userId).heroAvatar(heroAvatar).build();
+        User user = User.builder()
+                .id(userId)
+                .heroAvatar(heroAvatar)
+                .currentHp(User.INIT_HP)
+                .build();
         UserManager.addUser(user);
         //将用户信息附着到channel上
         ctx.channel().attr(AttributeKey.valueOf("userId")).set(userId);
