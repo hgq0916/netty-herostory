@@ -15,6 +15,8 @@ import org.tinygame.herostory.msg.GameMsgProtocol.UserQuitResult;
 
 /**
  * 测试地址 http://cdn0001.afrxvk.cn/hero_story/demo/step010/index.html?serverAddr=127.0.0.1:12345&userId=1
+ * http://cdn0001.afrxvk.cn/hero_story/demo/step020/index.html?serverAddr=127.0.0.1:12345&userId=1
+ * http://cdn0001.afrxvk.cn/hero_story/demo/step030/index.html?serverAddr=127.0.0.1:12345&userId=1
  * @author hugangquan
  * @date 2021/09/21 17:46
  */
@@ -63,25 +65,9 @@ public class GameMsgHandler extends SimpleChannelInboundHandler<Object> {
         System.out.println("收到客户端消息:clazz="+msg.getClass().getName()+",msg="+msg);
 
         //判断消息是否属于游戏消息，不属于则不处理
-        if(!(msg instanceof GeneratedMessageV3)){
-            return;
+        if(msg instanceof GeneratedMessageV3){
+            MainTheadProcessor.getInstance().process(ctx,(GeneratedMessageV3) msg);
         }
-
-        ICmdHandler<? extends GeneratedMessageV3> handler = CmdHandlerFactory.create(msg.getClass());
-        if(handler != null){
-            //泛型处理
-            handler.handle(ctx,cast(msg));
-        }
-
     }
-
-
-    static private  <TCmd extends GeneratedMessageV3> TCmd cast(Object msg){
-        if(msg == null){
-            return null;
-        }
-        return (TCmd)msg;
-    }
-
 
 }

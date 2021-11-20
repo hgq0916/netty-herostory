@@ -26,6 +26,8 @@ public class UserAttkCmdHandler implements ICmdHandler<UserAttkCmd> {
             return;
         }
 
+        System.out.println(Thread.currentThread().getName());
+
         int targetUserId = userAttkCmd.getTargetUserId();
 
         //创建用户攻击消息
