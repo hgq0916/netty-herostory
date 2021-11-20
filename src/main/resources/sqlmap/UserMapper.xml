@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.tinygame.herostory.login.mapper.UserMapper">
+    <select id="getUserByUsername" parameterType="string" resultType="org.tinygame.herostory.model.UserEntity">
+        SELECT id,username,password,hero_avatar as heroAvatar FROM user WHERE username=#{username}
+    </select>
+
+    <insert id="insertUser" parameterType="org.tinygame.herostory.model.UserEntity">
+        <selectKey keyProperty="id" resultType="java.lang.Integer" order="BEFORE">
+            SELECT LAST_INSERT_ID() as id
+        </selectKey>
+        insert into User(username,password,hero_avatar) values(#{username},#{password},#{heroAvatar})
+    </insert>
+
+
+</mapper>

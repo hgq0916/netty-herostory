@@ -20,6 +20,9 @@ public class ServerMain {
 
     public static void main(String[] args) {
 
+        //初始化数据库连接
+        SqlSessionHolder.init();
+
         //初始化消息识别器
         GameMsgRecognizer.init();
         //初始化工厂

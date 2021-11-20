@@ -6,30 +6,34 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
+ * 用户实体
  * @author hugangquan
- * @date 2021/11/08 22:09
+ * @date 2021/11/20 21:52
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class User {
+public class UserEntity {
 
-    //用户初始血量
-    public static final int INIT_HP = 100;
-
-    //用户id
+    /**
+     * 用户id
+     */
     private Integer id;
 
+    /**
+     * 用户名
+     */
     private String username;
 
-    //英雄头像
+    /**
+     * 密码
+     */
+    private String password;
+
+    /**
+     * 英雄头像
+     */
     private String heroAvatar;
-
-    //当前血量
-    private int currentHp;
-
-    //移动状态
-    MoveState moveState;
 
 }

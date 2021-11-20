@@ -14,25 +14,24 @@ import org.tinygame.herostory.msg.GameMsgProtocol;
 public class UserEntryCmdHandler implements ICmdHandler<GameMsgProtocol.UserEntryCmd>{
 
     public void handle(ChannelHandlerContext ctx, GameMsgProtocol.UserEntryCmd msg) {
-        GameMsgProtocol.UserEntryCmd userEntryCmd = msg;
-        int userId = userEntryCmd.getUserId();
-        String heroAvatar = userEntryCmd.getHeroAvatar();
+
+        Integer userId = (Integer) ctx.channel().attr(AttributeKey.valueOf("userId")).get();
+
+        if(userId == null){
+            return;
+        }
+
+        User user = UserManager.getUserById(userId);
+        if(user == null){
+            return;
+        }
 
         //向所有客户端转发用户入场消息
         GameMsgProtocol.UserEntryResult.Builder builder = GameMsgProtocol.UserEntryResult.newBuilder();
         builder.setUserId(userId);
-        builder.setHeroAvatar(heroAvatar);
+        builder.setHeroAvatar(user.getHeroAvatar());
+        builder.setUserName(user.getUsername());
         GameMsgProtocol.UserEntryResult userEntryResult = builder.build();
-
-        //将用户加入群组
-        User user = User.builder()
-                .id(userId)
-                .heroAvatar(heroAvatar)
-                .currentHp(User.INIT_HP)
-                .build();
-        UserManager.addUser(user);
-        //将用户信息附着到channel上
-        ctx.channel().attr(AttributeKey.valueOf("userId")).set(userId);
 
         BroadCaster.broadcast(userEntryResult);
     }
