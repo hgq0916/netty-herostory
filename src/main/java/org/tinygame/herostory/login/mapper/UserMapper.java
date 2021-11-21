@@ -14,4 +14,10 @@ public interface UserMapper {
 
     int insertUser(UserEntity userEntity);
 
+    /**
+     * 更新英雄形象
+     * @param userId
+     * @param heroAvatar
+     */
+    int updateHeroAvatar(@Param("userId") Integer userId,@Param("heroAvatar") String heroAvatar);
 }

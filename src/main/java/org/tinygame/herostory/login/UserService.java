@@ -58,4 +58,20 @@ public final class UserService {
         return userEntity;
     }
 
+    public void updateHeroAvatar(Integer userId, String heroAvatar) {
+
+        if(userId == null || heroAvatar == null){
+            return;
+        }
+
+        try(SqlSession sqlSession = SqlSessionHolder.getInstance().openSession()){
+
+            sqlSession.getMapper(UserMapper.class)
+                    .updateHeroAvatar(userId,heroAvatar);
+
+        }catch (Exception ex){
+            LOGGER.error("",ex);
+        }
+
+    }
 }

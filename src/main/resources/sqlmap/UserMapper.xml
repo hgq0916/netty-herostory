@@ -7,11 +7,15 @@
     </select>
 
     <insert id="insertUser" parameterType="org.tinygame.herostory.model.UserEntity">
-        <selectKey keyProperty="id" resultType="java.lang.Integer" order="BEFORE">
-            SELECT LAST_INSERT_ID() as id
+        <selectKey keyProperty="id" resultType="java.lang.Integer" order="AFTER">
+            SELECT LAST_INSERT_ID()
         </selectKey>
         insert into User(username,password,hero_avatar) values(#{username},#{password},#{heroAvatar})
     </insert>
+
+    <update id="updateHeroAvatar">
+        update user set hero_avatar=#{heroAvatar,jdbcType=VARCHAR} where id=#{userId,jdbcType=INTEGER}
+    </update>
 
 
 </mapper>
