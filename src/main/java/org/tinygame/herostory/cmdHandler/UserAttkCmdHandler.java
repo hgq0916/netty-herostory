@@ -22,6 +22,8 @@ public class UserAttkCmdHandler implements ICmdHandler<UserAttkCmd> {
         //获取当前用户
         Integer attkUserId = (Integer) ctx.channel().attr(AttributeKey.valueOf("userId")).get();
 
+        System.out.println("用户攻击>目标用户:"+attkUserId+">"+userAttkCmd.getTargetUserId());
+
         if(attkUserId == null){
             return;
         }

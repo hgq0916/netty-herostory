@@ -47,6 +47,7 @@ public class UserLoginCmdHandler implements ICmdHandler<UserLoginCmd> {
                 .id(userEntity.getId())
                 .username(userEntity.getUsername())
                 .heroAvatar(userEntity.getHeroAvatar())
+                .currentHp(User.INIT_HP)
                 .build();
 
         UserManager.addUser(user);
