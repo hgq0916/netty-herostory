@@ -53,6 +53,7 @@ public final class UserService {
             }
         }catch (Exception e){
             LOGGER.error("",e);
+            throw new RuntimeException("用户名或密码错误");
         }
 
         return userEntity;

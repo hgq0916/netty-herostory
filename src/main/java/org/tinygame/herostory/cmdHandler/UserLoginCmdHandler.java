@@ -33,10 +33,18 @@ public class UserLoginCmdHandler implements ICmdHandler<UserLoginCmd> {
 
         UserService userService = UserService.getInstance();
 
-        UserEntity userEntity = userService.login(userName, password);
+        UserEntity userEntity = null;
+
+        try{
+            userEntity = userService.login(userName, password);
+        }catch (Exception ex){
+            LOGGER.error("",ex);
+        }
+
 
         if(userEntity == null){
             LOGGER.error("用户登录失败，username="+userName);
+            return;
         }
 
         //将用户绑定到通道
