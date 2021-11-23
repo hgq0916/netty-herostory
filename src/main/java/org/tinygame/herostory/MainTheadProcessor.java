@@ -55,6 +55,10 @@ public final class MainTheadProcessor {
         });
     }
 
+    public void process(Runnable runnable){
+        executorService.submit(runnable);
+    }
+
     static private  <TCmd extends GeneratedMessageV3> TCmd cast(Object msg){
         if(msg == null){
             return null;

@@ -3,7 +3,9 @@ package org.tinygame.herostory.login;
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tinygame.herostory.AsyncOperation;
 import org.tinygame.herostory.AsyncThreadProcessor;
+import org.tinygame.herostory.MainTheadProcessor;
 import org.tinygame.herostory.SqlSessionHolder;
 import org.tinygame.herostory.login.mapper.UserMapper;
 import org.tinygame.herostory.model.UserEntity;
@@ -30,15 +32,53 @@ public final class UserService {
 
     public void login(String username, String password, Function<UserEntity,Void> callback){
 
+        UserLoginAsyncOperation userLoginAsyncOperation = new UserLoginAsyncOperation(username,password,callback);
+
         AsyncThreadProcessor.getInstance().process(()->{
+            try{
+                //执行异步操作
+                userLoginAsyncOperation.doAsync();
 
-            LOGGER.info("当前线程："+Thread.currentThread().getName());
-
-            if(null == username || null == password){
-                callback.apply(null);
+                //执行回调
+                MainTheadProcessor.getInstance().process(()->{
+                    try{
+                        userLoginAsyncOperation.doFinish();
+                    }catch (Exception ex){
+                        LOGGER.error("",ex);
+                    }
+                });
+            }catch (Exception ex){
+                LOGGER.error("",ex);
             }
 
-            UserEntity userEntity = null;
+        });
+    }
+
+
+    private class UserLoginAsyncOperation implements AsyncOperation {
+
+        private final String username;
+
+        private final String password;
+
+        private final Function<UserEntity,Void> callback;
+
+        private UserEntity userEntity;
+
+        public UserLoginAsyncOperation(String username,String password,Function<UserEntity,Void> callback){
+            this.username = username;
+            this.password = password;
+            this.callback = callback;
+        }
+
+        @Override
+        public void doAsync() {
+
+            LOGGER.info("doAsync当前线程："+Thread.currentThread().getName());
+
+            if(null == username || null == password){
+                return;
+            }
 
             try(SqlSession sqlSession = SqlSessionHolder.getInstance().openSession()){
                 UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
@@ -54,14 +94,32 @@ public final class UserService {
                     userMapper.insertUser(userEntity);
                 }
 
-                callback.apply(userEntity);
-
             }catch (Exception e){
                 LOGGER.error("",e);
             }
-        });
+
+        }
+
+        @Override
+        public void doFinish() {
+
+            LOGGER.info("doFinish当前线程："+Thread.currentThread().getName());
+
+            if(callback != null){
+                callback.apply(userEntity);
+            }
+        }
+
     }
 
+
+
+
+    /**
+     * 更新英雄头像
+     * @param userId
+     * @param heroAvatar
+     */
     public void updateHeroAvatar(Integer userId, String heroAvatar) {
 
         if(userId == null || heroAvatar == null){
