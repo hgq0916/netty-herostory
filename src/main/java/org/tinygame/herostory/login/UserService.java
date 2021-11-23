@@ -1,5 +1,6 @@
 package org.tinygame.herostory.login;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,12 @@ public final class UserService {
 
         UserLoginAsyncOperation userLoginAsyncOperation = new UserLoginAsyncOperation(username,password,callback);
 
+        int bindId = 0;
+
+        if(StringUtils.isNotBlank(username)){
+            bindId = username.charAt(username.length()-1);
+        }
+
         AsyncThreadProcessor.getInstance().process(()->{
             try{
                 //执行异步操作
@@ -51,7 +58,7 @@ public final class UserService {
                 LOGGER.error("",ex);
             }
 
-        });
+        },bindId);
     }
 
 

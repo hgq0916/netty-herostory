@@ -10,12 +10,18 @@ import java.util.concurrent.Executors;
  */
 public final class AsyncThreadProcessor {
 
-    private  final ExecutorService executorService;
+    private  final ExecutorService[] executorServices;
 
     private AsyncThreadProcessor(){
-        executorService = Executors.newSingleThreadExecutor((r)->{
-            return new Thread(r,"AsyncThreadProcessor");
-        });
+
+        executorServices = new ExecutorService[8];
+
+       for(int i=0;i<executorServices.length;i++){
+           int finalI = i;
+           executorServices[i] = Executors.newSingleThreadExecutor((r)->{
+               return new Thread(r,"AsyncThreadProcessor_"+ finalI);
+           });
+       }
     }
 
     private static final AsyncThreadProcessor instance = new AsyncThreadProcessor();
@@ -24,8 +30,14 @@ public final class AsyncThreadProcessor {
         return instance;
     }
 
-    public void process(Runnable runnable){
-        executorService.submit(runnable);
+    public void process(Runnable runnable,int bindId){
+
+        //根据bindId找到一个线程池
+        int hash = Math.abs(bindId);
+        int index = hash % executorServices.length;
+
+        executorServices[index].submit(runnable);
+
     }
 
 }
