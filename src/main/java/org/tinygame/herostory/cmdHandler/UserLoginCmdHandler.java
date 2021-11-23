@@ -11,6 +11,8 @@ import org.tinygame.herostory.model.UserManager;
 import org.tinygame.herostory.msg.GameMsgProtocol;
 import org.tinygame.herostory.msg.GameMsgProtocol.UserLoginCmd;
 
+import java.util.function.Function;
+
 /**
  * 用户登录消息处理
  * @author hugangquan
@@ -33,42 +35,49 @@ public class UserLoginCmdHandler implements ICmdHandler<UserLoginCmd> {
 
         UserService userService = UserService.getInstance();
 
-        UserEntity userEntity = null;
 
-        try{
-            userEntity = userService.login(userName, password);
-        }catch (Exception ex){
-            LOGGER.error("",ex);
-        }
+        Function<UserEntity,Void> callback = (userEntity)->{
+            try{
 
+                if(userEntity == null){
+                    LOGGER.error("用户登录失败，username="+userName);
+                    return null;
+                }
 
-        if(userEntity == null){
-            LOGGER.error("用户登录失败，username="+userName);
-            return;
-        }
+                //将用户绑定到通道
+                ctx.channel().attr(AttributeKey.valueOf("userId")).set(userEntity.getId());
 
-        //将用户绑定到通道
-        ctx.channel().attr(AttributeKey.valueOf("userId")).set(userEntity.getId());
+                //将用户加入群组
+                User user = User.builder()
+                        .id(userEntity.getId())
+                        .username(userEntity.getUsername())
+                        .heroAvatar(userEntity.getHeroAvatar())
+                        .currentHp(User.INIT_HP)
+                        .build();
 
-        //将用户加入群组
-        User user = User.builder()
-                .id(userEntity.getId())
-                .username(userEntity.getUsername())
-                .heroAvatar(userEntity.getHeroAvatar())
-                .currentHp(User.INIT_HP)
-                .build();
+                UserManager.addUser(user);
 
-        UserManager.addUser(user);
+                //返回用户登录成功消息
+                GameMsgProtocol.UserLoginResult.Builder builder = GameMsgProtocol.UserLoginResult.newBuilder();
+                builder.setUserId(user.getId());
+                builder.setUserName(user.getUsername());
+                builder.setHeroAvatar(user.getHeroAvatar());
 
-        //返回用户登录成功消息
-        GameMsgProtocol.UserLoginResult.Builder builder = GameMsgProtocol.UserLoginResult.newBuilder();
-        builder.setUserId(user.getId());
-        builder.setUserName(user.getUsername());
-        builder.setHeroAvatar(user.getHeroAvatar());
+                GameMsgProtocol.UserLoginResult userLoginResult = builder.build();
 
-        GameMsgProtocol.UserLoginResult userLoginResult = builder.build();
+                ctx.writeAndFlush(userLoginResult);
 
-        ctx.writeAndFlush(userLoginResult);
+            }catch (Exception ex){
+                LOGGER.error("",ex);
+            }
+
+            return null;
+
+        };
+
+        //用户登录
+        userService.login(userName, password,callback);
+
 
     }
 }
