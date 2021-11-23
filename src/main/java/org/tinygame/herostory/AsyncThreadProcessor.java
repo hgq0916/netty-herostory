@@ -30,13 +30,20 @@ public final class AsyncThreadProcessor {
         return instance;
     }
 
-    public void process(Runnable runnable,int bindId){
 
+    private ExecutorService getExecutorService(int bindId){
         //根据bindId找到一个线程池
         int hash = Math.abs(bindId);
         int index = hash % executorServices.length;
 
-        executorServices[index].submit(runnable);
+        return executorServices[index];
+    }
+
+    public void process(Runnable runnable,int bindId){
+
+        ExecutorService executorService = getExecutorService(bindId);
+
+        executorService.submit(runnable);
 
     }
 
