@@ -1,5 +1,6 @@
 package org.tinygame.herostory.login;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
@@ -10,6 +11,8 @@ import org.tinygame.herostory.MainTheadProcessor;
 import org.tinygame.herostory.SqlSessionHolder;
 import org.tinygame.herostory.login.mapper.UserMapper;
 import org.tinygame.herostory.model.UserEntity;
+import org.tinygame.herostory.util.RedisUtil;
+import redis.clients.jedis.Jedis;
 
 import java.util.Objects;
 import java.util.function.Function;
@@ -41,24 +44,7 @@ public final class UserService {
             bindId = username.charAt(username.length()-1);
         }
 
-        AsyncThreadProcessor.getInstance().process(()->{
-            try{
-                //执行异步操作
-                userLoginAsyncOperation.doAsync();
-
-                //执行回调
-                MainTheadProcessor.getInstance().process(()->{
-                    try{
-                        userLoginAsyncOperation.doFinish();
-                    }catch (Exception ex){
-                        LOGGER.error("",ex);
-                    }
-                });
-            }catch (Exception ex){
-                LOGGER.error("",ex);
-            }
-
-        },bindId);
+        AsyncThreadProcessor.getInstance().process(userLoginAsyncOperation,bindId);
     }
 
 
@@ -103,6 +89,21 @@ public final class UserService {
 
             }catch (Exception e){
                 LOGGER.error("",e);
+            }
+
+            //将用户信息写入redis
+            try(Jedis jedis = RedisUtil.getInstance().getRedis()){
+
+                UserEntity simpleUserEntity = new UserEntity();
+                simpleUserEntity.setId(userEntity.getId());
+                simpleUserEntity.setUsername(userEntity.getUsername());
+                simpleUserEntity.setHeroAvatar(userEntity.getHeroAvatar());
+
+                jedis.hset("User:"+userEntity.getId(),"userInfo", JSON.toJSONString(simpleUserEntity));
+                jedis.hset("User:"+userEntity.getId(),"win","0");
+                jedis.hset("User:"+userEntity.getId(),"lose","0");
+            }catch (Exception ex){
+                LOGGER.error("",ex);
             }
 
         }

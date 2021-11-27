@@ -11,6 +11,7 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import org.tinygame.herostory.cmdHandler.CmdHandlerFactory;
+import org.tinygame.herostory.util.RedisUtil;
 
 /**
  * @author hugangquan
@@ -20,6 +21,8 @@ public class ServerMain {
 
     public static void main(String[] args) {
 
+        //初始化redis
+        RedisUtil.init();
         //初始化数据库连接
         SqlSessionHolder.init();
 
