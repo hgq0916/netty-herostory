@@ -1,11 +1,14 @@
 package org.tinygame.herostory.cmdHandler;
 
+import com.alibaba.fastjson.JSON;
 import com.google.protobuf.GeneratedMessageV3;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.AttributeKey;
+import org.tinygame.herostory.attk.UserAttkMsg;
 import org.tinygame.herostory.model.BroadCaster;
 import org.tinygame.herostory.model.User;
 import org.tinygame.herostory.model.UserManager;
+import org.tinygame.herostory.mq.RocketMqProducer;
 import org.tinygame.herostory.msg.GameMsgProtocol;
 import org.tinygame.herostory.msg.GameMsgProtocol.UserAttkCmd;
 
@@ -57,6 +60,10 @@ public class UserAttkCmdHandler implements ICmdHandler<UserAttkCmd> {
         int currentHp = targetUser.getCurrentHp() - subtractHp;
 
         if(currentHp<=0){
+
+            //发送用户输赢消息
+            sendUserAttkMsg(attkUserId,targetUserId);
+
             //用户死亡，广播用户死亡消息
             broadCastUserDied(targetUser);
         }
@@ -65,6 +72,22 @@ public class UserAttkCmdHandler implements ICmdHandler<UserAttkCmd> {
 
         //广播用户血量减少消息
         broadCastSubstractHp(targetUser,subtractHp);
+
+    }
+
+    /**
+     * 发送用户输赢消息
+     * @param attkUserId
+     * @param targetUserId
+     */
+    private void sendUserAttkMsg(Integer attkUserId, int targetUserId) {
+
+        UserAttkMsg userAttkMsg = UserAttkMsg.builder()
+                .attkUserId(attkUserId)
+                .targetId(targetUserId)
+                .build();
+
+        RocketMqProducer.getInstance().send("Victor", JSON.toJSONString(userAttkMsg));
 
     }
 
