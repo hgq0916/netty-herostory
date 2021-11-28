@@ -143,5 +143,19 @@ public final class UserService {
             LOGGER.error("",ex);
         }
 
+        //更新redis中的用户头像
+        try(Jedis jedis = RedisUtil.getInstance().getRedis()){
+
+            String userInfo = jedis.hget("User:" + userId, "userInfo");
+
+            UserEntity userEntity = JSON.parseObject(userInfo, UserEntity.class);
+
+            userEntity.setHeroAvatar(heroAvatar);
+
+            jedis.hset("User:"+userId,"userInfo",JSON.toJSONString(userEntity));
+        }catch (Exception ex){
+            LOGGER.error("",ex);
+        }
+
     }
 }
