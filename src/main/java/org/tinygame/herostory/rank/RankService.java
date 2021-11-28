@@ -86,8 +86,6 @@ public final class RankService {
 
                 List<RankItem> items = new ArrayList<>();
 
-                int i = 0;
-
                 for(Tuple tuple : rank){
 
                     String userId = tuple.getElement();
@@ -95,7 +93,6 @@ public final class RankService {
 
                     RankItem rankItem = new RankItem();
 
-                    rankItem.setRankId(++i);
                     rankItem.setUserId(Integer.parseInt(userId));
                     rankItem.setWin(Double.valueOf(score).intValue());
 
@@ -113,6 +110,22 @@ public final class RankService {
                     items.add(rankItem);
 
                 }
+
+                items.sort((item1,item2)->{
+
+                    if(item1.getWin()>item2.getWin()){
+                        return -1;
+                    }else if(item1.getWin()<item2.getWin()){
+                        return 1;
+                    }
+                    return 0;
+                });
+
+                int i = 0;
+
+               for(RankItem rankItem: items){
+                   rankItem.setRankId(++i);
+               }
 
             //绑定排名列表到当前对象
             rankItems = items;

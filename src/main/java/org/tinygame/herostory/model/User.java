@@ -32,4 +32,9 @@ public class User {
     //移动状态
     MoveState moveState;
 
+    /**
+     * 死亡状态
+     */
+    private boolean died;
+
 }

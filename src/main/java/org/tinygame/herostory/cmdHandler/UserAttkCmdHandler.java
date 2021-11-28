@@ -61,6 +61,8 @@ public class UserAttkCmdHandler implements ICmdHandler<UserAttkCmd> {
 
         if(currentHp<=0){
 
+            targetUser.setDied(true);
+
             //发送用户输赢消息
             sendUserAttkMsg(attkUserId,targetUserId);
 
