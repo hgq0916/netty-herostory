@@ -28,7 +28,7 @@ public final class RedisUtil {
 
     public static void init(){
         try{
-            jedisPool = new JedisPool("localhost",6379);
+            jedisPool = new JedisPool("192.168.25.128",6379);
         }catch (Exception ex){
             LOGGER.error("创建jedisPool出错：",ex);
         }

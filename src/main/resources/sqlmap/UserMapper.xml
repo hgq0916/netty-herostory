@@ -10,7 +10,7 @@
         <selectKey keyProperty="id" resultType="java.lang.Integer" order="AFTER">
             SELECT LAST_INSERT_ID()
         </selectKey>
-        insert into User(username,password,hero_avatar) values(#{username},#{password},#{heroAvatar})
+        insert into user(username,password,hero_avatar) values(#{username},#{password},#{heroAvatar})
     </insert>
 
     <update id="updateHeroAvatar">
