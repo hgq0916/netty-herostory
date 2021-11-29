@@ -17,13 +17,13 @@ public class JarClassLoadTest {
     @Test
     public void test(){
 
-        File file = new File("H:\\herostory\\target\\classes\\org\\tinygame\\herostory\\cmdHandler\\herostory.jar");
+        /*File file = new File("H:\\herostory\\target\\classes\\org\\tinygame\\herostory\\cmdHandler\\herostory.jar");
 
         System.out.println(file.getName());
 
         Set<Class<?>> classes = PackageUtil.listClazzFromJar(file, "org.tinygame.herostory.cmdHandler", true, (clazz) -> {
             return ICmdHandler.class.isAssignableFrom(clazz);
-        });
+        });*/
 
     }
 
