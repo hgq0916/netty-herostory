@@ -10,6 +10,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tinygame.herostory.cmdHandler.CmdHandlerFactory;
 import org.tinygame.herostory.mq.RocketMqProducer;
 import org.tinygame.herostory.util.RedisUtil;
@@ -20,7 +22,11 @@ import org.tinygame.herostory.util.RedisUtil;
  */
 public class ServerMain {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServerMain.class);
+
     public static void main(String[] args) {
+
+        LOGGER.info("服务器正在启动...");
 
         //初始化redis
         RedisUtil.init();
@@ -31,6 +37,9 @@ public class ServerMain {
 
         //初始化消息识别器
         GameMsgRecognizer.init();
+
+        LOGGER.info("初始化工厂...");
+
         //初始化工厂
         CmdHandlerFactory.init();
         //两个线程池

@@ -1,5 +1,8 @@
 package org.tinygame.herostory.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
@@ -12,6 +15,9 @@ import java.util.jar.JarInputStream;
  * 名称空间实用工具
  */
 public final class PackageUtil {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PackageUtil.class);
+
     /**
      * 类默认构造器
      */
@@ -222,7 +228,7 @@ public final class PackageUtil {
      * @param filter      类过滤器
      * @return 符合条件的类集合
      */
-    static private Set<Class<?>> listClazzFromJar(
+    static public Set<Class<?>> listClazzFromJar(
         final File jarFilePath, final String packageName, final boolean recursive, IClazzFilter filter) {
 
         if (jarFilePath == null ||
@@ -231,6 +237,10 @@ public final class PackageUtil {
             // 则直接退出!
             return null;
         }
+
+        LOGGER.info("jarFilePath:{},packageName:{}",jarFilePath,packageName);
+
+        String packageDir = packageName.replaceAll("\\.","/");
 
         // 结果对象
         Set<Class<?>> resultSet = new HashSet<>();
@@ -249,7 +259,13 @@ public final class PackageUtil {
                 // 获取进入点名称
                 String entryName = entry.getName();
 
-                if (!entryName.endsWith(".class")) {
+                if (entryName.charAt(0) == '/') {
+                    // 获取后面的字符串
+                    entryName = entryName.substring(1);
+                }
+
+                if(!entryName.startsWith(packageDir) || !entryName.endsWith(".class")){
+                    //如果entry不以包名开头，跳过
                     // 如果不是以 .class 结尾,
                     // 则说明不是 JAVA 类文件, 直接跳过!
                     continue;
@@ -280,7 +296,20 @@ public final class PackageUtil {
                 clazzName = join(clazzName.split("/"), ".");
 
                 // 加载类定义
-                Class<?> clazzObj = Class.forName(clazzName);
+                LOGGER.info("正在加载类:"+clazzName);
+
+                Class<?> clazzObj = null;
+
+                try{
+                    clazzObj = Class.forName(clazzName);
+                }catch (Throwable ex){
+                    LOGGER.warn("加载类失败",ex.getLocalizedMessage());
+                    throw new RuntimeException(ex);
+                }
+
+                if(clazzObj == null){
+                    continue;
+                }
 
                 if (null != filter &&
                     !filter.accept(clazzObj)) {
