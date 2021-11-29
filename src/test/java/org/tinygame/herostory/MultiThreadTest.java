@@ -21,10 +21,10 @@ public class MultiThreadTest {
          * 原因：变量对于不同的线程来说不可见，当一个线程对变量执行了减法操作，该变量最新的值并不能被另一个线程立即看到
          */
 
-        for(int i=0;i<10000;i++){
+        /*for(int i=0;i<10000;i++){
             System.out.println("循环:"+(i+1)+"次");
             testThread();
-        }
+        }*/
 
     }
 
@@ -37,10 +37,10 @@ public class MultiThreadTest {
          * 但是另一个线程也同样拿到100尝试减10操作，然后把修改后的值90同步到主存，所以最后结果是90
          */
 
-        for(int i=0;i<10000;i++){
+      /*  for(int i=0;i<10000;i++){
             System.out.println("循环:"+(i+1)+"次");
             testThread();
-        }
+        }*/
 
     }
 
@@ -52,11 +52,11 @@ public class MultiThreadTest {
          * 使用synchonized同步,可以解决减血同步问题
          */
 
-        for(int i=0;i<100000;i++){
+       /* for(int i=0;i<100000;i++){
             System.out.println("循环:"+(i+1)+"次");
             testThread2();
         }
-
+*/
     }
 
     @Test
@@ -67,10 +67,10 @@ public class MultiThreadTest {
          * 使用AtomicInteger,可以解决多线程并发操作同一变量的问题
          */
 
-        for(int i=0;i<100000;i++){
+        /*for(int i=0;i<100000;i++){
             System.out.println("循环:"+(i+1)+"次");
             testThread3();
-        }
+        }*/
 
     }
 
@@ -86,10 +86,10 @@ public class MultiThreadTest {
          * user2持有锁，等待user1释放锁，造成相互无限等待
          */
 
-        for(int i=0;i<100000;i++){
+       /* for(int i=0;i<100000;i++){
             System.out.println("循环:"+(i+1)+"次");
             testThread4();
-        }
+        }*/
 
     }
 

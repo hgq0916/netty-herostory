@@ -16,7 +16,7 @@ public class ThreadPoolTest {
     /**
      * 测试阻塞队列
      */
-    @Test
+    //@Test
     public void test01(){
         BlockingQueue<Integer> blockingQueue = new LinkedBlockingQueue<>();
 
@@ -72,7 +72,7 @@ public class ThreadPoolTest {
     /**
      * 测试阻塞队列
      */
-    @Test
+    //@Test
     public void test02(){
 
         //创建两个生产者线程，一个消费者线程
