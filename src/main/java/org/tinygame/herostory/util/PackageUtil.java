@@ -238,8 +238,6 @@ public final class PackageUtil {
             return null;
         }
 
-        LOGGER.info("jarFilePath:{},packageName:{}",jarFilePath,packageName);
-
         String packageDir = packageName.replaceAll("\\.","/");
 
         // 结果对象
@@ -294,9 +292,6 @@ public final class PackageUtil {
                 clazzName = entryName.substring(0, entryName.lastIndexOf('.'));
                 // 将所有的 / 修改为 .
                 clazzName = join(clazzName.split("/"), ".");
-
-                // 加载类定义
-                LOGGER.info("正在加载类:"+clazzName);
 
                 Class<?> clazzObj = null;
 
