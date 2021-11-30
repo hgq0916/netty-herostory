@@ -105,8 +105,8 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
-                    <!--包含文件夹以及子文件夹下所有资源-->
-                    <include>**/*.*</include>
+                    <include>**/*.properties</include>
+                    <include>**/*.xml</include>
                 </includes>
             </resource>
         </resources>
@@ -122,19 +122,10 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.2.0</version>
                 <configuration>
-                    <finalName>herostory</finalName>
-                    <appendAssemblyId>false</appendAssemblyId>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <archive>
-                        <manifest>
-                            <!-- 此处指定main方法入口的class -->
-                            <mainClass>org.tinygame.herostory.ServerMain</mainClass>
-                        </manifest>
-                    </archive>
                     <descriptors>
                         <descriptor>assembly/assembly.xml</descriptor>
                     </descriptors>
